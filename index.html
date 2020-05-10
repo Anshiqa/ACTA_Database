@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="main_style.css">
+
+      <title>Web Portfolio von Marco</title>
+  </head>
+
+  <body>
+    <div class="Nav_bar">
+      <ul>
+        <li><a href="/">HOME</a></li>
+        <li><a href="/blog/">ABOUT</a></li>
+        <li><a href="/projekte/">MATERIALS</a></li>
+        <li><a href="/kontakt/">SUPPORT</a></li>
+      </ul>
+    </div>
+  
+    <!----------------------------------------------------------------------------------------------------->
+    <div class="title_class">
+      <h1 class="title">ATCALAB COMBINATORY MATERIALS DATABSE</h1>
+    </div>
+    <!----------------------------------------------------------------------------------------------------->
+
+    <div class="description_class">
+      <h2 id="description">Select the required materials to view our recorded properties.</h2>
+    </div>
+    <!----------------------------------------------------------------------------------------------------->     
+    <!--To use bootstrap grid, create a container, add row, 
+      label classes within with col-->
+    <div class = "home_body_div container">
+      <div class ="row">
+        <div class = "mat_list_div col" > <!--put space within the quotes to assign 2 class names -->
+          
+          <p id="Materials"> MATERIALS</p>
+          
+          <div class= "search_class">
+            <p id="Search"> Search </p>
+          </div>
+
+          <div class="data_list_class">
+            <p id ="A">A________________________________________________</p>
+            <br>
+            <br>
+            <p id ="B">B________________________________________________</p>
+            <br>
+            <br>
+            <p id ="C">C________________________________________________</p>
+            <br>
+            <br>
+            
+          </div>
+        </div>
+        <!--Insert Table-->
+        <div class = "add_class col">
+          <p id="add_excel"> Add New (Upload Excel)</p>
+          <p id="add_logger"> Add New (Via Logger) </p>
+        </div>
+      </div>
+    </div>
+    <!----------------------------------------------------------------------------------------------------->
+  <!--add to ensure bootstrap works---> 
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+    <!---------------------------------->
+  </body>
+</html>
