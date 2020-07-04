@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+<!---------------------------------------------------->
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main_style.css') }}">
+
+      <title>Upload new via Excel</title>
+  </head>
+<!---------------------------------------------------->
+
+
+  <body>
+    {% include 'navbar.html' %}
+    <!---------------------------------------------------->
+    
+    <div class = "container">
+        <div class="row pt-3"> <!--pt-3 adds padding to top of row-->
+            <h4> Data Details </h4> 
+        </div> 
+            
+        <form method ="POST" enctype="multipart/form-data">
+        <div class="form-group">
+
+            <!--- details of contributor ------------------------------>
+            <div class="row pt-3">
+                <label>Name and designation of contributor: </label>
+                <input type="text" class="form-control"  name="nameContributor" value="Example: John Smith (PhD student)">
+
+                <label >Research Group:</label>
+                <input  class="form-control" type="text" name="researchGroup">
+
+                <label >Lab Location:</label>
+                <input  class="form-control" type="text" name="labLocation">
+
+                <label >Conditions of collection:</label>
+                <input  class="form-control" type="text" name="conditions">
+            </div>
+            <!--------------------------------------------------->
+            <!--- instrument details ------------------------------>
+            <!--Dynamically  updating labels for instrument and datatype-->
+            <div class="row pt-3">     
+                <div id="chosenInstru"></div> <!--input given from the script portion-->
+                <br><br>
+                <div id="chosenData"></div> <!--input given from the script portion-->
+            </div>    
+            <!--------------------------------------------------->
+
+            <!--- details of material ------------------------------>
+            <div class="row pt-3">
+                <div class="col">
+                    <label >Material Name:</label>
+                    <input class="form-control"  type="text" name="materialName" >
+                </div>
+
+                <div class="col">
+                    <label> Upload Data: </label>
+                    <div class="form-group">
+                        <input type="file" class="form-control-file" name = "uploadedFile">
+                    </div>
+                </div>
+            </div>
+            <!--------------------------------------------------->
+                
+            <!--- privacy options ------------------------------>
+            <div class="row pt-3 ">
+                    <div class = "form-check">
+                    <div class="radio">
+                        <label class="form-check-label"><input class="form-check-input" type="radio" name="optradio" value = "ActaLab Members Only"> ActaLab Members Only</label>
+                    </div>
+                        
+                    <div class="radio">
+                        <label class="form-check-label"><input class="form-check-input" type="radio" name="optradio" value = "SUTD Community Only"> SUTD Community Only</label>
+                    </div>
+                        
+                    <div class="radio">
+                        <label class="form-check-label"><input class="form-check-input" type="radio" name="optradio" value = "Global Community"> Global Community</label>
+                    </div>
+
+                    <div class="checkbox">
+                        <label class ="form-check-label" ><input type="checkbox" class="form-check-input" value ="rechecked"> I have rechecked the information to ensure it is correct.</label>
+                    </div>
+                    </div>
+            </div>
+            <!--------------------------------------------------->
+            <div class="row pt-3">
+                    <button type = "submit" class="btn btn-primary"> Submit </button>
+            </div>
+        </div> <!--close column-->
+        </div> <!--close form-group-->
+        </form>
+
+
+    </div> <!--close container-->
+<!--------------------------------------------------->
+    <script type="text/javascript">
+        let chosenDataType ='{{chosenDataType}}';
+
+        let chosenInstru ='{{chosenInstru}}';
+    </script>
+<!--------------------------------------------------->
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/enter_info.js') }}"></script>
+  </body>
+
+  </html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/show_material.css') }}">
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+      <title>ACTALAB Datasite</title>
+  </head> 
+
+  <body>
+    {% include 'navbar.html' %}
+  
+    
+    <!----------------------------------------------------------------------------------------------------->
+    <div class ="container">
+        <div class = "row">
+          <div class="mx-auto text-center" id ="material_header_display"></div>
+        </div>
+
+        <div class = "row">  
+          <div id="display_info"  class="mx-auto text-center"> </div>
+          <!--add any info here-->
+        </div>
+
+        <div class = "row">
+          <div class = "mx-auto text-center" id = "display_data">
+            <h4> Data Preview: </h4>
+            
+            <div id ="DataPreview">
+              <!-- <iframe src="/static/Uploads/66ab4730-c5cf-4e05-8a0a-be6cd3c0cab8.txt" name="data" scrolling="auto"  width="700" height="300" ></iframe>  -->
+            </div>
+
+            <form method="POST">
+              <button class="btn"> <i class="fa fa-download"></i> Download</button>
+           </form>
+          </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+      let material_name = '{{material_name}}'; 
+      
+      let sub_id = '{{sub_id}}';
+      //let var_for_js = '{{var_from_python}}' ;'
+      //pass all dicts to js also
+      let material_data = {{material_data| tojson |safe}} ; // don't query the datafile from list because - Object of type bytes is not JSON serializable
+      let contributor_data= {{contributor_data| tojson |safe}} ;
+      let submission_data= {{submission_data| tojson |safe}}  ;
+      let auto_material_data = {{auto_material_data |safe}} ; //so that it is seen as JS array, otherwise remains string
+    </script>
+    
+
+    <!----------------------------------------------------------------------------------------------------->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/show_material.js') }}"></script>
+    <!--add to ensure bootstrap works---> 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+    <!---------------------------------->
+  </body>
+</html>

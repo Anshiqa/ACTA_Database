@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"explorer.compactFolders": false,
+		"python.pythonPath": "venv/bin/python3"
+	}
+}

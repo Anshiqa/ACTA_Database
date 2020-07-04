@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main_style.css') }}">
+
+      <title>Upload new via Excel</title>
+  </head>
+  <!------------------------------------------------------>
+
+  <body>
+    {% include 'navbar.html' %}   
+  
+    <!----------------------------------------------------------------------------------->
+    <div class="container">  
+
+      <div class="row pt-3"> 
+        <h1 class="display-4  mx-auto text-center"> Select Datatype</h1>
+      </div>
+      
+      <div class="row pt-3">
+        <div class="list-group list-group-flush mx-auto text-center" id="dataName" >
+          <!--ul from select_datatype.js is created here-->
+        </div>
+      </div>
+      
+    <!----------------------------------------------------------------------------------->
+    <!--make a clickable list of all the datatypes for the instrument selected.-->
+    <script type="text/javascript">
+      let instruName ='{{instru}}';
+      let data = {{data|safe}};
+     // window.alert("data");
+     // window.alert(Object.keys(data)[0]); //outputs "linkam", first key of the json dictionary
+     // window.alert(data[instruName]); //output values of the key string provided 
+    </script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/select_datatype.js') }}"></script>
+
+    <!----------------------------------------------------------------------------------->
+  </body>
+
+  </html>

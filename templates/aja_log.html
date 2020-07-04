@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main_style.css') }}">
+
+      <title>ACTALAB Datasite</title>
+  </head>
+
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="description_class">
+      <h2 style="text-align: center;">.SF LOG.</h2>
+      <h2 id="description">A record of samples fabricated for ACTA Lab</h2>
+      
+    </div>
+    <div class ="container">
+        <div class="row">
+            <iframe width="1200px" height="1000" frameBorder="0" style="box-shadow: 5px 10px 18px #d3d3d3;" src="https://docs.google.com/spreadsheets/d/1QhxFqpt0gB7hN8g6XzI4ZynCTsjYSWtsG6R5nlrux8E/edit?rm=minimal#gid=0usp=sharing"></iframe>
+        </div>
+
+    </div>
+    <!----------------------------------------------------------------------------------------------------->     
+    <!--To use bootstrap grid, add create a container, add row, add col
+      label classes with container / row / col-->
+ 
+    <!----------------------------------------------------------------------------------------------------->
+    
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/list_materials.js') }}"></script>
+    <!--add to ensure bootstrap works--->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+    <!---------------------------------->
+
+
+  </body>
+</html>

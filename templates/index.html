@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main_style.css') }}">
+
+      <title>ACTALAB Datasite</title>
+  </head>
+
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="description_class">
+      <h2 id="description">Select the required materials to view our recorded properties.</h2>
+    </div>
+    <!----------------------------------------------------------------------------------------------------->     
+    <!--To use bootstrap grid, add create a container, add row, add col
+      label classes with container / row / col-->
+    <div class = "home_body_div container">
+      
+      <div class ="row pt-3">
+        <button type="button" class="btn btn-outline-info btn-lg btn-block">
+          <a href="/list-materials" style="color: inherit;"> View All Recorded Materials </a>
+          <!--use inherit to inherit the color of font from parent, istead of default href font-->
+        </button>
+      </div>
+
+      <div class="row pt-3">
+          <!--specify url fragment where hyperlink links to-->
+          <button type="button" class="btn btn-outline-info btn-lg btn-block">
+            <a href="/newInstru" style="color: inherit;"> Add New (self - collected in Lab) </a>
+          </button>
+      </div>
+
+      <div class ="row pt-3">
+        <button type="button" class="btn btn-outline-info btn-lg btn-block">
+          <a href="/aja-log" style="color: inherit;"> New Record in SF Log </a>
+          <!--use inherit to inherit the color of font from parent, istead of default href font-->
+        </button>
+      </div>
+
+      <div class ="row pt-3">
+        <button type="button" class="btn btn-outline-info btn-lg btn-block">
+          <a href="/auto-add" style="color: inherit;"> Auto-Add New Material Property </a>
+          <!--use inherit to inherit the color of font from parent, istead of default href font-->
+        </button>
+      </div>
+
+    </div>
+
+    <!----------------------------------------------------------------------------------------------------->
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <!--add to ensure bootstrap works--->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+    <!---------------------------------->
+
+
+  </body>
+</html>
