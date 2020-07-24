@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!---^^link to bootstrap stylesheet-->
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main_style.css') }}">
-
+    
       <title>ACTALAB Datasite</title>
   </head>
 
@@ -39,12 +39,12 @@
         <div class="row">
           
             <div class="data_list_class" style="width: 100%;">
-                <table class = "table table-active table-bordered table-hover-responsive-xl style="border-width:2px; " " width="100%" id="myTable" >
+                <table class = "table table-active table-bordered table-hover-responsive-xl" width="100%" id="myTable" >
                 <thead class="thead-dark">
                     <tr id='tableHeader'>
-                    <th scope="col" onclick="sortTable(0)" class="h5"> Material <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
-                    <th scope="col" onclick="sortTable(1)" class="h5">  Source of Data  <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
-                    <th scope="col" onclick="sortTable(2)" class="h5">  Date Added  <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
+                    <th onclick="sortTable(0)" class="h5"> Material <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
+                    <th onclick="sortTable(1)" class="h5">  Source of Data  <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
+                    <th onclick="sortTable(2)" class="h5">  Date Added  <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,8 +57,7 @@
 
     <!----------------------------------------------------------------------------------------------------->
     <script type="text/javascript">
-      let materials_listOfDicts = {{materials_listOfDicts|safe}};
-      let materials_data_linkam = {{materials_data_linkam|safe}};
+      let instrument_details_dict = {{instrument_details_dict|safe}};  
       
       function searchTable() 
         {
@@ -84,57 +83,65 @@
                 {tr[i].style.display = "none";}
             }
         }
-    </script>
-
-    <!---to sort by ascending/descending order fo each col header-->
-    <script>
-      function sortTable(n) {
+      /*PROBLEM!! --> CANNOT SORT ALPHANUMERIC!*/
+      function sortTable(n) 
+      { 
         var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
         table = document.getElementById("myTable");
         switching = true;
-        // Set the sorting direction to ascending:
-        dir = "asc";
-        /* Make a loop that will continue until
-        no switching has been done: */
-        while (switching) {
-          // Start by saying: no switching is done:
+        //Set the sorting direction to ascending:
+        dir = "asc"; 
+        /*Make a loop that will continue until no switching has been done:*/
+        while (switching) 
+        {
+          //start by saying: no switching is done:
           switching = false;
           rows = table.rows;
-          /* Loop through all table rows (except the
-          first, which contains table headers): */
+          /*Loop through all table rows (except the first, which contains table headers):*/
           for (i = 1; i < (rows.length - 1); i++) {
-            // Start by saying there should be no switching:
+            //start by saying there should be no switching:
             shouldSwitch = false;
-            /* Get the two elements you want to compare,
-            one from current row and one from the next: */
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            /* Check if the two rows should switch place,
-            based on the direction, asc or desc: */
-            if (dir == "asc") {
-              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                // If so, mark as a switch and break the loop:
-                shouldSwitch = true;
-                break;
-              }
-            } else if (dir == "desc") {
-              if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                // If so, mark as a switch and break the loop:
-                shouldSwitch = true;
-                break;
-              }
+  
+            /*Get the two elements you want to compare, one from current row and one from the next:*/
+            tagnameX = rows[i].getElementsByTagName("TD")[n].tagName;
+            console.log(tagnameX); //--> TD. If it was a paragraph, tagname would be "P"
+            x = rows[i].getElementsByTagName("TD")[n].children[0].innerHTML; //first item within the td cell, be it p or a
+            console.log(x);
+
+            tagnameY = rows[i + 1].getElementsByTagName("TD")[n].tagName;
+            y = rows[i + 1].getElementsByTagName("TD")[n].children[0].innerHTML;
+            console.log(y);
+            /*check if the two rows should switch place, based on the direction, asc or desc:*/
+            console.log(new Intl.Collator().compare(x, y)); //if x > y, prints neg number
+            if (dir == "asc") 
+            {
+              if ((new Intl.Collator().compare(x, y))<0 ) 
+                {
+                //if so, mark as a switch and break the loop:
+                  shouldSwitch= true;
+                  break;
+                }
+
+            } else if (dir == "desc") 
+            {
+              if ((new Intl.Collator().compare(x, y))>0) 
+                {
+                  //if so, mark as a switch and break the loop:
+                  shouldSwitch = true;
+                  break;
+                }  
             }
           }
           if (shouldSwitch) {
-            /* If a switch has been marked, make the switch
-            and mark that a switch has been done: */
+            /*If a switch has been marked, make the switch
+            and mark that a switch has been done:*/
             rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
             switching = true;
-            // Each time a switch is done, increase this count by 1:
-            switchcount ++;
+            //Each time a switch is done, increase this count by 1:
+            switchcount ++;      
           } else {
-            /* If no switching has been done AND the direction is "asc",
-            set the direction to "desc" and run the while loop again. */
+            /*If no switching has been done AND the direction is "asc",
+            set the direction to "desc" and run the while loop again.*/
             if (switchcount == 0 && dir == "asc") {
               dir = "desc";
               switching = true;
@@ -142,7 +149,12 @@
           }
         }
       }
-      </script>
+      
+
+    </script>
+
+    <!---to sort by ascending/descending order fo each col header-->
+ 
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/list_materials.js') }}"></script>
     <!--add to ensure bootstrap works--->

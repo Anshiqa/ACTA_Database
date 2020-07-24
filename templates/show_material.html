@@ -49,14 +49,13 @@
 
     <script type="text/javascript">
       let material_name = '{{material_name}}'; 
-      
       let sub_id = '{{sub_id}}';
       //let var_for_js = '{{var_from_python}}' ;'
       //pass all dicts to js also
-      let material_data = {{material_data| tojson |safe}} ; // don't query the datafile from list because - Object of type bytes is not JSON serializable
-      let contributor_data= {{contributor_data| tojson |safe}} ;
-      let submission_data= {{submission_data| tojson |safe}}  ;
-      let auto_material_data = {{auto_material_data |safe}} ; //so that it is seen as JS array, otherwise remains string
+      let sub_id_instrument_details = {{sub_id_instrument_details |safe}};
+      let FileNameDict = {{FileNameDict | safe}};
+      // var dataFileio = new Blob('{{dataFileBytes}}');
+      // let blobSrc = URL.createObjectURL(dataFileBytes);
     </script>
     
 

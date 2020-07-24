@@ -22,48 +22,57 @@
     
     <div class = "container">
         <div class="row pt-3"> <!--pt-3 adds padding to top of row-->
-            <h4> Data Details </h4> 
+            <h4> Details of Data Collection  </h4> 
+        </div> 
+
+        <!--- instrument details ------------------------------>
+        <!--Dynamically  updating labels for instrument and datatype-->
+        <div class="row pt-3">     
+            <div id="chosenInstru"></div> <!--input given from the script portion-->
+            <br><br>
+            <div id="chosenData"></div> <!--input given from the script portion-->
         </div> 
             
+        <!--start a form here-->
         <form method ="POST" enctype="multipart/form-data">
-        <div class="form-group">
 
-            <!--- details of contributor ------------------------------>
-            <div class="row pt-3">
-                <label>Name and designation of contributor: </label>
-                <input type="text" class="form-control"  name="nameContributor" value="Example: John Smith (PhD student)">
-
-                <label >Research Group:</label>
-                <input  class="form-control" type="text" name="researchGroup">
-
-                <label >Lab Location:</label>
-                <input  class="form-control" type="text" name="labLocation">
-
-                <label >Conditions of collection:</label>
-                <input  class="form-control" type="text" name="conditions">
-            </div>
-            <!--------------------------------------------------->
-            <!--- instrument details ------------------------------>
-            <!--Dynamically  updating labels for instrument and datatype-->
-            <div class="row pt-3">     
-                <div id="chosenInstru"></div> <!--input given from the script portion-->
-                <br><br>
-                <div id="chosenData"></div> <!--input given from the script portion-->
-            </div>    
-            <!--------------------------------------------------->
-
-            <!--- details of material ------------------------------>
-            <div class="row pt-3">
-                <div class="col">
-                    <label >Material Name:</label>
-                    <input class="form-control"  type="text" name="materialName" >
+            <!--operator field-->
+            <div class="form-group row pt-3">
+                <label for="inputOperator" class="col-sm-2 col-form-label">Operator: </label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="nameOperator" id="inputOperator" placeholder="Name of Operator">
                 </div>
+            </div>
 
-                <div class="col">
-                    <label> Upload Data: </label>
-                    <div class="form-group">
-                        <input type="file" class="form-control-file" name = "uploadedFile">
-                    </div>
+            <!--sample id field-->
+            <div class="form-group row">
+                <label for="inputSampleID" class="col-sm-2 col-form-label">Sample ID: </label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="nameSampleID" id="inputSampleID" placeholder="Sample ID">
+                </div>
+            </div>
+
+            <!--comments field-->
+            <div class="form-group row">
+                <label for="inputComments" class="col-sm-2 col-form-label">Comments: </label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="nameComments" id="inputComments" placeholder="Enter Comments">
+                </div>
+            </div>
+
+            <!--comments field-->
+            <div class="form-group row">
+                <label for="inputComposition" class="col-sm-2 col-form-label">Composition: </label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="nameComposition" id="inputComposition" placeholder="Composition of Sample">
+                </div>
+            </div>
+
+            <!--- upload data of material ------------------------------>
+            <div class="row pt-3">
+                <label> Upload Data: </label>
+                <div class="form-group">
+                    <input type="file" class="form-control-file" name = "uploadedFile">
                 </div>
             </div>
             <!--------------------------------------------------->
@@ -74,6 +83,7 @@
                     <div class="radio">
                         <label class="form-check-label"><input class="form-check-input" type="radio" name="optradio" value = "ActaLab Members Only"> ActaLab Members Only</label>
                     </div>
+
                         
                     <div class="radio">
                         <label class="form-check-label"><input class="form-check-input" type="radio" name="optradio" value = "SUTD Community Only"> SUTD Community Only</label>
@@ -92,8 +102,6 @@
             <div class="row pt-3">
                     <button type = "submit" class="btn btn-primary"> Submit </button>
             </div>
-        </div> <!--close column-->
-        </div> <!--close form-group-->
         </form>
 
 

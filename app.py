@@ -12,20 +12,19 @@ import datetime
 #UPLOAD_FOLDER = '/path/to/the/uploads'
 #ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 #The UPLOAD_FOLDER is where we will store the uploaded files 
-#The ALLOWED_EXTENSIONS is the set of allowed file extensions,
 #prevent users form uploading HTML files that will mess up website
 app =Flask(__name__)
-
 
 app.config['UPLOAD_FOLDER'] = 'static/Uploads'
 app.config['AUTO_UPLOAD_FOLDER'] = 'static/autoUploads'
 
-connection = mysql.connector.connect(host='localhost',
+connection = mysql.connector.connect(host='actalab.c1smye8boisx.us-east-2.rds.amazonaws.com',
                                     database='actalab',
-                                    user='root',
-                                    password='12345678')
-    #verify if connected
+                                    user='admin',
+                                    password='12345678') 
+#must add inbound rule in RDS--> 0.0.0.0 in security group to allow all ip adresses to enter 
 
+#verify if connected
 db_Info = connection.get_server_info()
 print("Connected to MySQL Server version ", db_Info)
             #cursor object formed by a MySQLConnection object, 
@@ -38,7 +37,6 @@ print("You're connected to database: ", record)
 #---------------------------------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------------------------------
-
 #make instrumentDict a variable
 with open('static/json/instrumentDict.json') as file:
     instruDict = json.load(file)
@@ -47,134 +45,93 @@ with open('static/json/instrumentDict.json') as file:
 def index():
     return render_template('index.html')
 #---------------------------------------------------------------------------------------------------------
-# function to create a list of dictionaries with keys - material_name and source_of_Data
-def Display_items_dict(material_table, submission_table):
-    items_nestList = []
-    no_of_records = len(material_table)
-    print ("material tables: ", material_table)
-    print ("submisssion table: ", submission_table)
-
-    if (no_of_records > 0) == True: 
-        for i in range(0,no_of_records):
-            print ("i: ", i)
-            keysList = [] #need to flush these list before going through next dictonary
-            valuesList = []
-            wanted_dict_material = material_table[i]
-            material_keys = wanted_dict_material.keys()
-            print ("material_keys:", material_keys)
-            for j in material_keys:
-                keysList.append(j)
-            
-            material_values = wanted_dict_material.values()
-            for m in material_values:
-                valuesList.append(m)
-                    
-            wanted_dict_subm = submission_table[i]
-        
-            submission_keys = wanted_dict_subm.keys()
-            for k in submission_keys:
-                keysList.append(k)
-            
-            submission_values = wanted_dict_subm.values()
-            for n in submission_values:
-                valuesList.append(n)
-
-            new_dict = {keysList[p]: valuesList[p] for p in range(len(keysList))}
-            items_nestList.append(new_dict)
-    print ("items_nestList: ", items_nestList)
-    return items_nestList
-    
 #---------------------------------------------------------------------------------------------------------
 @app.route('/list-materials')
 def listMaterials():
-    cursor.execute('SELECT submission_id, material_name FROM material_details')
-    materials_data = cursor.fetchall()
-    #print ("materials_data:", materials_data) #data: [{'submission_id': 1, 'material_name': 'Carbon'}, {'submission_id': 2, 'material_name': 'Silicon'}, {'submission_id': 3, 'material_name': 'Helium'}, {'submission_id': 4, 'material_name': 'Gold'}]
-    #print (type(materials_data)) #dictionaries inside list
-    
-    cursor.execute('SELECT source_data, curr_time FROM submission_details')
-    sources_data = cursor.fetchall()  #data: [{'source_data': ___,}, {'source_data': '____'},
-    for i in sources_data:
-        dateAndTime = i["curr_time"]
-        #type of datetime is <class 'datetime.datetime'>  
-        convertedDateTime = dateAndTime.strftime("%d/%m/%Y, %H:%M:%S")
-        #converts to dd/mm/yyyy and time in hrs/min/sec
-        #converted to string type
-        i["curr_time"] = convertedDateTime #replace value in dictionary
+  
+    # for i in sources_data:
+    #     dateAndTime = i["curr_time"]
+    #     #type of datetime is <class 'datetime.datetime'>  
+    #     convertedDateTime = dateAndTime.strftime("%d/%m/%Y, %H:%M:%S")
+    #     #converts to dd/mm/yyyy and time in hrs/min/sec
+    #     #converted to string type
+    #     i["curr_time"] = convertedDateTime #replace value in dictionary
 
-    complete_listOfDicts = Display_items_dict(materials_data,sources_data)
-    #print (complete_listOfDicts)
-    #can change function so that it takes in inputs from material table and usbmission table. 
-    # can show one column for material name and one for source of data
-    cursor.execute('SELECT submission_id, operator, sample_id, run, composition, heating_rate, max_temp, comment, resolution, lens, curr_time FROM linkam_table')
-    materials_data_linkam = cursor.fetchall()
-    for i in materials_data_linkam:
-        dateAndTime = i["curr_time"]
-        convertedDateTime = dateAndTime.strftime("%d/%m/%Y, %H:%M:%S")
-        #converts to dd/mm/yyyy
-        i["curr_time"] = convertedDateTime
+
+    # for i in materials_data_linkam:
+    #     dateAndTime = i["curr_time"]
+    #     convertedDateTime = dateAndTime.strftime("%d/%m/%Y, %H:%M:%S")
+    #     #converts to dd/mm/yyyy
+    #     i["curr_time"] = convertedDateTime
+
+    #--for new tables format---------------------------------------------------
+    #query for all submitted items in the database 
+    cursor.execute('SELECT submission_id, sample_id, instrument_id, instrument_name FROM instrument_details')  #can't take datafile beacuse not string
+    instrument_details_dict = cursor.fetchall() #data: [{'submission_id': ___,'instrument_name':___...}, {'submission_id': ___, 'instrument_name':___...},..]      
+   
+    #remove all duplicated dicts in the obtained list (duplicated because for each header_value, sub id, sample id and instrument is the same)
+    instrument_details_dict = [i for n, i in enumerate(instrument_details_dict) if i not in instrument_details_dict[n + 1:]] 
+    print ('instrument_details_dict: ',instrument_details_dict)
     
-    #print ("materials_data_linkam:" : [{'submission_id': 1, 'operator': 'Alyssa', 'sample_id': AJA3, 'run': 2, 'composition': 'Ge2SbTe5'....}, {'submission_id': 2, 'operator': 'Alyssa', 'sample_id': AJA3, 'run': 2, 'composition': 'Ge2SbTe5'....}, {'submission_id': 3, 'operator': 'Alyssa', 'sample_id': AJA3, 'run': 2, 'composition': 'Ge2SbTe5'....}]
-    return render_template('list_materials.html', materials_listOfDicts = complete_listOfDicts, materials_data_linkam=materials_data_linkam )
+    #query for compostition value of each submission id 
+    queryForCompositions = "SELECT submission_id, header_value FROM instrument_details WHERE instrument_header_field = %s"
+    compositionString = ("composition", ) #will be used to replace the %s placeholder in the query execute
+    cursor.execute(queryForCompositions, compositionString)
+    compositions_dict = cursor.fetchall()
+    print ('compositions_dict: ', compositions_dict) 
+
+    #for each dict item in instrument_details_dict, add the matching composition key-value to the dict 
+    #by adding according to item in list... can be changed by using the matching sub_id?
+    for n in range(0,len(instrument_details_dict)):
+        instrument_details_dict[n]['composition']=  compositions_dict[n]['header_value']
+
+    return render_template('list_materials.html', instrument_details_dict=instrument_details_dict )
 #---------------------------------------------------------------
-def write_file(data, filename):
-    with open(filename, 'wb') as f:
-        f.write(data)
+def write_file(DBdata, filenameInUser):
+    with open(filenameInUser, 'wb') as f:
+        f.write(DBdata)
+        #new data is being written on the 'filename' file
+        #so, in the user's download location, the 'filename' file is being replaced by the data file
 
 #---------------------------------------------------------------
 @app.route('/show-material/<sub_id>/<material_name>',  methods=['GET', 'POST'])
 def material(sub_id, material_name):
+    #convert sub_id obtained from page link to an integer type
     sub_id = int(sub_id)
     print (sub_id, type(sub_id))
-    select_material_query = 'SELECT submission_id, material_name, file_name_in_server, data_format, instrument, datatype FROM material_details WHERE submission_id = %s'
-    cursor.execute(select_material_query,(sub_id,))
-    material_data = cursor.fetchall() #this is like this [{'submission_id': 5, 'material_name': 'Argon', 'data_format': '.txt', 'instrument': 'Linkam', 'datatype': 'Optical spectra vs Temperature'}]
-    #material_data is actually a string! not list object so, need to aprse as JSON object
+
+    #query all details from instrument_details for the wanted submission_id 
+    select_sample_details ='SELECT * FROM instrument_details WHERE submission_id = %s'
+    cursor.execute(select_sample_details, (sub_id,) )  #sub_id used to replace the %s placeholder ... can't take datafile beacuse not string
+    sub_id_instrument_details = cursor.fetchall() #data: [{'submission_id': ___,'instrument_name':___}, {'submission_id': ___, 'instrument_name':___},..]      
+   
+    #remove all duplicated dicts from the obtained list (in case of any)
+    sub_id_instrument_details = [i for n, i in enumerate(sub_id_instrument_details) if i not in sub_id_instrument_details[n + 1:]] 
+    print ('sub_id_instrument_details: ',sub_id_instrument_details)
     
-    print("my_material_data: ", material_data)
-    print ('hello!')
-    #print ('material_data:', material_data)
-
-    select_contributor_query = 'SELECT * FROM contributor_details WHERE submission_id = %s'
-    cursor.execute(select_contributor_query, (sub_id,) )
-    contributor_data = cursor.fetchall()
-    print ("my_contributor_data: " ,contributor_data)
-    #contributor_data = listOfTuple_to_List(my_contributor_data)
-    #print ('contributor_data:', contributor_data)
-
-    select_submission_query = 'SELECT * FROM submission_details WHERE submission_id = %s'
-    cursor.execute(select_submission_query, (sub_id,) )
-    submission_data = cursor.fetchall()
-    print ("my_subs_data: ", submission_data)
-
-    select_auto_instrument = 'SELECT operator, sample_id, run, composition, heating_rate, max_temp, comment, resolution, lens, file_name_in_server, data_format FROM linkam_table WHERE submission_id = %s'
-    cursor.execute(select_auto_instrument, (sub_id,) )
-    auto_material_data = cursor.fetchall()
-    print ("auto_material_data: ", auto_material_data)
-    #submission_data = listOfTuple_to_List(my_submission_data) #submission_data: ['5', 'ActaLab Members Only', '', 'Self-Collected']
-    #print ('submission_data:', submission_data)
     #--------------------------------------------------------------------------------------------------------------
-    if request.method == "POST":
-        if len(material_data) != 0: 
-            query = "SELECT data_file, data_format FROM material_details WHERE submission_id=%s" 
-        else:
-            query = "SELECT data_file, data_format FROM linkam_table WHERE submission_id=%s"
-        cursor.execute(query,(sub_id,))
-        listOfDataDict = cursor.fetchall() 
-        print (listOfDataDict) #[{data_file: "bfjbfj", data_Format: "rubgr"}]
-        dataFileBytes = listOfDataDict[0].get('data_file')
-        print ("filename: ", "filename")
-        #print ("photo: ", photo)
-        extension = listOfDataDict[0].get('data_format')  #use fetchone so that not returned in a tuple
-        print ("extension: ", extension)
-        
-        #create a new filename that the data is downloaded as when saved in users computer
-        write_file(dataFileBytes, 'User'+str(sub_id)+ extension) 
-        print ("i'm here also!")
-    #---------------------------------------------------------------
-    print ("i'm here!")
-    print(material_name)
-    return render_template('show_material.html', material_name = material_name, sub_id= sub_id, material_data=material_data,contributor_data=contributor_data, submission_data=submission_data, auto_material_data =auto_material_data )
+    #get data blob and allow user to write file onto local computer by downloading
+    query = "SELECT data_file, data_format FROM instrument_data WHERE submission_id=%s"
+    cursor.execute(query,(sub_id,))
+    DataDict = cursor.fetchall() 
+    print (DataDict) #[{data_file: "someexample", data_Format: ".txt"}]
+
+    #obtain the data file blob as a variable
+    dataFileBytes = DataDict[0].get('data_file')
+    #obtain the extension as a variable
+    extension = DataDict[0].get('data_format')  #use fetchone so that not returned in a tuple
+    print ("extension: ", extension)
+    #create a new filename that the data is downloaded as when saved in users computer
+    write_file(dataFileBytes, 'User'+str(sub_id)+ extension) 
+    print ("i'm here also!")
+
+    #----------------------------------------------------
+    #query file_name_in_server from instrument_data separately because a blob cannot be passed through JS as string
+    queryForFilename = "SELECT file_name_in_server FROM instrument_data WHERE submission_id=%s"
+    cursor.execute(queryForFilename,(sub_id,))
+    FileNameDict = cursor.fetchall() 
+
+    return render_template('show_material.html', material_name = material_name, sub_id= sub_id, sub_id_instrument_details =sub_id_instrument_details, FileNameDict = FileNameDict )
 #---------------------------------------------------------------
 #if this url fragment is seen in the browser, then render this html page
 #pass InstruDict as 'data'
@@ -198,55 +155,72 @@ def convertToBinaryData(filename):
 #use method GET and POST as a parameter to be passed into the enter_info template
 @app.route('/selected-instru&datatype/<instruName>/<chosenDataType>', methods=['GET', 'POST'])
 def enter_info(instruName, chosenDataType):
-    print ("hello")
     print (instruName, chosenDataType)
     if request.method=='POST':
-        nameContributor=request.form['nameContributor']
-        researchGroup=request.form['researchGroup']
-        labLocation=request.form['labLocation']
-        conditions=request.form['conditions']
+        print ("hello")
+        #----get new submission id(odd)-----------
+        used_id_list_odd = []
+        cursor.execute('SELECT submission_id FROM instrument_data')
+        used_submissionID = cursor.fetchall() #data: [{'submission_id': ___}, {'submission_id': ___},..]
+        if not cursor.rowcount: #specifies number of rows that the last .execute*() outputs
+            this_submission_id = 1
+            print ("No data yet")
+        else:
+            for i in used_submissionID:
+                if (i['submission_id'])%2 != 0: #id is odd, add to list
+                    used_id_list_odd.append(i['submission_id'])
+            if len(used_id_list_odd) == 0: #table is not empty BUT no ODD id yet
+                this_submission_id = 1
+            else: 
+                used_id_list_odd = sorted(used_id_list_odd)
+                this_submission_id = used_id_list_odd[-1] + 2 #grab last id and add 2 for new odd number
+        print ('this_submission_id: ', this_submission_id)
+
+        #----upload details of file into the TABLE instrument details ------------
+        operator=request.form['nameOperator'] #comes from NAME parameter of input in the form
+        print ("hello2")
+        sampleId=request.form['nameSampleID']
+        comments=request.form['nameComments']
+        composition=request.form['nameComposition']
+        curr_time = datetime.datetime.now() #has milliseconds also :(
+        curr_time = curr_time.strftime("%Y-%m-%d %H:%M:%S") #only h,m,s
+        #output: curr_time: 2020-07-10 07:32:44
+        privacyOption = request.form['optradio']
+        print (operator, sampleId, comments,composition )
+        print ("Privacy Option:")
+        print (privacyOption)
+        #create a dictionary with key: value as header_name: header_value
+        header_dict = {'operator': operator, 'comments':comments, 'composition':composition, 'Upload Time': curr_time}
+        for key, value in header_dict.items():
+            print ("hello2")
+            print (key, value)
+            insertFileDetails = "INSERT INTO instrument_details(submission_id, sample_id, instrument_id, instrument_name, instrument_header_field, header_value) VALUES (%s, %s,%s, %s, %s, %s)"
+            cursor.execute(insertFileDetails,(this_submission_id, sampleId, 1, instruName, key, value))
+            connection.commit()
+        #----upload binary datafile and filename in server to TABLE instrument_data ------------
+        #get the uploaded file from the form
         uploadedFile = request.files['uploadedFile']
-        #split the extension name from the file name to add to new file name later
+        #split the extension name from the file name (to add it to the new file name later)
         extension = os.path.splitext(uploadedFile.filename)[1]
         #create a new unique file name using uuid
         f_name = str(uuid.uuid4()) + extension
         #Create a folder called Uploads in  static folder. 
-        #Add the path to the Upload folder in the app configuration (above)
-        # upload the file into the static/uploads folder
+        #Using the path to the static/uploads folder (declared in the app configuration above), put data file there with new name 
         uploadedFile.save(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
-        #print filename
+        #use funciton defined above to convert file into binary data (put into database as longblob)
+        theFile = convertToBinaryData("static/Uploads/" + f_name)
+
         print ('filename', f_name) #filename 55166e7d-72df-46dc-b0e0-8d67b3fe35e0.pdf
         print ('bytes:', uuid.uuid4().bytes) #bytes: b'\x8f[\x84\xafr\x1fOF\xa3\xee\xa8\t\xcd\xf5SJ'
-        theFile = convertToBinaryData( "static/Uploads/" + f_name)
+        print(type(theFile)) #output: <class 'bytes'>
 
-        # print ("theFileBinary:", theFile )
-        # print(type(theFile)) #output: <class 'bytes'>
-        
-        materialName = request.form['materialName']
-
-        privacyOption = request.form['optradio']
-
-        print (nameContributor, researchGroup, labLocation, conditions)
-        print (materialName)
-        print ("Privacy Option:")
-        print (privacyOption)
-        
-        insertQueryContributer = "INSERT INTO contributor_details(contributor_name, lab_locn, research_grp, collecn_conditions) VALUES (%s,%s, %s, %s)"
-        cursor.execute( insertQueryContributer,(nameContributor,researchGroup,labLocation,conditions))
-        
-        insertQueryMaterial = "INSERT INTO material_details(material_name, data_format, data_file, file_name_in_server, instrument, datatype) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute( insertQueryMaterial,(materialName, extension ,theFile, f_name, instruName, chosenDataType))
+        insertDataFile = "INSERT INTO instrument_data(submission_id, sample_id, instrument_id, instrument_name, data_file, file_name_in_server, data_format) VALUES (%s, %s,%s, %s, %s, %s, %s)"
+        cursor.execute( insertDataFile,(this_submission_id, sampleId,  1 , instruName, theFile, f_name, extension))
         connection.commit()
-        print(cursor.rowcount, "Record inserted successfully into table 2")
 
-        insertQuerySubmission = "INSERT INTO submission_details(privacy_option, file_type, source_data) VALUES (%s, %s, %s)"
-        cursor.execute(insertQuerySubmission,(privacyOption,'','Self-Collected'))
-        connection.commit() #rememeber to commit the record!
-        print(cursor.rowcount, "Record inserted successfully into table 3")
-        
 
         print(cursor.rowcount, "Record inserted successfully into table")
-        return redirect('/upload_data') #redirect when submit button clicked
+        return redirect('/upload_data') #redirect to this page when submit button clicked
         #has to be above cursor.close otherwise casues problems
         
          #sends user to next page via submit button also.
@@ -260,45 +234,76 @@ def createKeyVals(data_text_list, n):
             val = labelSplit[1]
             return key, val
 
+#create submissionID list for even numbers
+
+
 @app.route('/auto-add', methods=['GET', 'POST'])
 def auto_add_DB():
     if request.method =='POST':
-        #save file to database
+        #---get list of all used submission ids
+        used_id_list_even = []
+        cursor.execute('SELECT submission_id FROM instrument_data')
+        used_submissionID = cursor.fetchall() #data: [{'submission_id': ___}, {'submission_id': ___},..]
+        if not cursor.rowcount: #specifies number of rows that the last .execute*() outputs
+            this_submission_id = 2
+            print ("No data yet")
+        else:
+            for i in used_submissionID:
+                if (i['submission_id']%2) == 0 : #is even, add to list
+                    used_id_list_even.append(i['submission_id']) 
+            if len(used_id_list_even) == 0: #table not empty BUT no even id yet
+                this_submission_id = 2
+            else: 
+                used_id_list_even = sorted(used_id_list_even)
+                this_submission_id = used_id_list_even[-1] + 2 #grab last id and add 2
+        print ('this_submission_id: ', this_submission_id)
+        
+        #-------save file to database---
         autoUploadFile = request.files['autoUploadFile']
         #split the extension name from the file name to add to new file name later
         extension = os.path.splitext(autoUploadFile.filename)[1]
         #create a new unique file name using uuid
         f_name = str(uuid.uuid4()) + extension
-        #Create a folder called Uploads in  static folder. 
-        #Add the path to the Upload folder in the app configuration (above)
-        # upload the file into the static/autoUploads folder
-        #define this autoUploads static folder above!
+        #add the autouploadedfile into the autoUpload folder (Declared in app confign above) 
         autoUploadFile.save(os.path.join(app.config['AUTO_UPLOAD_FOLDER'], f_name))
-        #print filename
+        fullFilePathServer = "static/autoUploads/" +f_name #get path name of file in server back
+        theFile = convertToBinaryData( fullFilePathServer )
         print ('filename', f_name) #filename 55166e7d-72df-46dc-b0e0-8d67b3fe35e0.pdf
         print ('bytes:', uuid.uuid4().bytes) #bytes: b'\x8f[\x84\xafr\x1fOF\xa3\xee\xa8\t\xcd\xf5SJ'
-        fileToCall = "static/autoUploads/" +f_name
-        theFile = convertToBinaryData( "static/autoUploads/" +f_name)
-        #Now read file and create  dictionary form of the values ot uploaded in database.
-        f = open(fileToCall,"r")
-        data_text_list =[]
+        
+        #---Read file and create dictionary of key-values in header---
+        f = open(fullFilePathServer,"r") #open submitted file and read file
+        data_text_list =[] #init empty list
         for line in f:
             l = line.strip()
             data_text_list.append(l)
         f.close
         print ('data_text_list: ', data_text_list)
-        recordDict = {}
+        recordDict = {} #create empty dict
         for n in range (0, 9):
-            key, val = createKeyVals(data_text_list, n)
+            key, val = createKeyVals(data_text_list, n) #use function defined above
             print ('key: ', key, 'val: ', val)
             # Adding a new key value pair
             recordDict[key] = val 
         print ('recordDict: ', recordDict)
-        insertQueryInstrument = "INSERT INTO linkam_table(operator, sample_id, run, composition, heating_rate, max_temp, comment, resolution, lens, file_name_in_server, data_format, data_file) VALUES (%s,%s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute( insertQueryInstrument, (recordDict['operator'], recordDict['SampleID'], recordDict['Run'], recordDict['Composition'], recordDict['Heating Rate'], recordDict['Max Temperature'], recordDict['Comment'], recordDict['Resolution'], recordDict['Lens'], f_name, extension, theFile))
+
+        #--get sample id and insert keyvals into mysql
+        sample_id = recordDict['SampleID']
+        for header, headerValue in recordDict.items():
+            print ('header: ', header, ' headerValue: ', headerValue)
+            if header != 'SampleID':
+                insertQueryInstrument = "INSERT INTO instrument_details(submission_id, sample_id, instrument_id, instrument_name, instrument_header_field, header_value) VALUES (%s, %s, %s, %s, %s, %s)"
+                cursor.execute( insertQueryInstrument, (this_submission_id, sample_id, 1, 'instruName', header, headerValue))
+                print("header inserted")
+                connection.commit()
+            else:
+                continue
+
+        #--insert datafile & file name in server into mysql
+        insertQueryInstrument = "INSERT INTO instrument_data(submission_id, sample_id, instrument_id, instrument_name, data_file, file_name_in_server, data_format) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute( insertQueryInstrument, (this_submission_id, sample_id, 1, 'instruName', theFile, f_name, extension))
         connection.commit()
     return render_template('auto_add.html')
-
 
 
 #---------------------------------------------------------------
@@ -374,3 +379,15 @@ if __name__=='__main__':
 # #------------------------------------------------------------------------------------
 
 
+        #nsertQueryContributer = "INSERT INTO contributor_details(contributor_name, lab_locn, research_grp, collecn_conditions) VALUES (%s,%s, %s, %s)"
+        # cursor.execute( insertQueryContributer,(nameContributor,researchGroup,labLocation,conditions))
+        
+        # insertQueryMaterial = "INSERT INTO material_details(material_name, data_format, data_file, file_name_in_server, instrument, datatype) VALUES (%s, %s, %s, %s, %s, %s)"
+        # cursor.execute( insertQueryMaterial,(materialName, extension ,theFile, f_name, instruName, chosenDataType))
+        # connection.commit()
+        # print(cursor.rowcount, "Record inserted successfully into table 2")
+
+        # insertQuerySubmission = "INSERT INTO submission_details(privacy_option, file_type, source_data) VALUES (%s, %s, %s)"
+        # cursor.execute(insertQuerySubmission,(privacyOption,'','Self-Collected'))
+        # connection.commit() #rememeber to commit the record!
+        # print(cursor.rowcount, "Record inserted successfully into table 3")
