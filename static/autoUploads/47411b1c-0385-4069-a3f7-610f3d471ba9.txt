@@ -1,0 +1,25 @@
+operator=alyssa
+SampleID=AJA3
+Run=1
+Composition=Ge2Sb2Te5
+Heating Rate=5
+Max Temperature=40
+Comment=Rob test
+Resolution=1600x1200
+Lens=x4
+------------------------------
+filename, time, temperature (C)
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_26.0.tiff,24.9838149548,25.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_27.0.tiff,36.2331249714,26.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_28.0.tiff,44.0238881111,27.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_29.0.tiff,50.9118700027,28.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_30.0.tiff,59.1309950352,29.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_31.0.tiff,66.830163002,30.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_32.0.tiff,78.1880960464,31.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_33.0.tiff,90.1592741013,32.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_34.0.tiff,101.514800072,33.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_35.0.tiff,113.177128077,34.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_36.0.tiff,124.950622082,35.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_37.0.tiff,138.33800602,36.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_38.0.tiff,150.606699944,37.0
+/Users/alyssa/Documents/data/robstests/AJA3_1_alyssa_39.0.tiff,162.970546007,38.0

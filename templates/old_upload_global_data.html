@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+
+<!---tells the browser about the type of the document.-->
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!---^^link to bootstrap stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/main_style.css') }}">
+
+      <title>ACTALAB Datasite</title>
+  </head>
+
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="description_class">
+      <h2 id="description">Upload data file of data extracted from digital global resources< to enter into database.</h2>
+    </div>
+    <!----------------------------------------------------------------------------------------------------->     
+    <!--To use bootstrap grid, add create a container, add row, add col
+      label classes with container / row / col-->
+    <div class = "home_body_div container">
+        <form method ="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <div class="row">
+            <label> Upload Data: </label>
+                <div class="form-group">
+                    <input type="file" class="form-control-file" name = "UploadGlobalFile">
+                </div>
+            </div>
+
+            <div class="row pt-3"> <!--pt-3 gives spacing at the top padding top - 3 units-->
+                <button type = "submit" class="btn btn-primary"> Submit </button>
+            </div>
+        </div>
+        </form>
+
+        <div class="table_heading">
+          <h2 id="description">View all Extracted Data</h2>
+        </div>
+
+        <!--searching option to filter the table display-->
+        <div class = "row">
+          <div class="input-group mb-3">
+          <input id='myInput' onkeyup='searchTable()' type='text' class="form-control" placeholder="Search" aria-label="Username" width="50%" >
+          </div>
+        </div>
+        <!-------------------------------------------------->
+
+        <div class="row">
+          
+            <div class="data_list_class" style="width: 100%;">
+                <table class = "table table-active table-bordered table-hover-responsive-xl" width="100%" id="myTable" >
+                <thead class="thead-dark">
+                    <tr id='tableHeader'>
+                    <th onclick="sortTable(0)" class="h5"> Property <button id="sort_arrows" style=" border:none; float: right;"> <span> &#8645;</span> </button> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                <!---Table goes here-->
+                </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!----------------------------------------------------------------------------------------------------->
+    <script type="text/javascript">
+      let global_published_property_dict = {{global_published_property_dict|safe}};  
+      
+      function searchTable() 
+        {
+          var input, filter, found, table, tr, td, i, j;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+          for (i = 0; i < tr.length; i++) 
+            {
+              td = tr[i].getElementsByTagName("td");
+              for (j = 0; j < td.length; j++) 
+                {
+                  if (td[j].innerHTML.toUpperCase().indexOf(filter) > -1) 
+                    {found = true;}
+                } 
+              if (found) 
+                {
+                  tr[i].style.display = "";
+                  found = false;
+                } 
+              else if (tr[i].id != 'tableHeader')
+                {tr[i].style.display = "none";}
+            }
+        }
+      /*PROBLEM!! --> CANNOT SORT ALPHANUMERIC!*/
+      function sortTable(n) 
+      { 
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("myTable");
+        switching = true;
+        //Set the sorting direction to ascending:
+        dir = "asc"; 
+        /*Make a loop that will continue until no switching has been done:*/
+        while (switching) 
+        {
+          //start by saying: no switching is done:
+          switching = false;
+          rows = table.rows;
+          /*Loop through all table rows (except the first, which contains table headers):*/
+          for (i = 1; i < (rows.length - 1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+  
+            /*Get the two elements you want to compare, one from current row and one from the next:*/
+            tagnameX = rows[i].getElementsByTagName("TD")[n].tagName;
+            console.log(tagnameX); //--> TD. If it was a paragraph, tagname would be "P"
+            x = rows[i].getElementsByTagName("TD")[n].children[0].innerHTML; //first item within the td cell, be it p or a
+            console.log(x);
+
+            tagnameY = rows[i + 1].getElementsByTagName("TD")[n].tagName;
+            y = rows[i + 1].getElementsByTagName("TD")[n].children[0].innerHTML;
+            console.log(y);
+            /*check if the two rows should switch place, based on the direction, asc or desc:*/
+            console.log(new Intl.Collator().compare(x, y)); //if x > y, prints neg number
+            if (dir == "asc") 
+            {
+              if ((new Intl.Collator().compare(x, y))<0 ) 
+                {
+                //if so, mark as a switch and break the loop:
+                  shouldSwitch= true;
+                  break;
+                }
+
+            } else if (dir == "desc") 
+            {
+              if ((new Intl.Collator().compare(x, y))>0) 
+                {
+                  //if so, mark as a switch and break the loop:
+                  shouldSwitch = true;
+                  break;
+                }  
+            }
+          }
+          if (shouldSwitch) {
+            /*If a switch has been marked, make the switch
+            and mark that a switch has been done:*/
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            //Each time a switch is done, increase this count by 1:
+            switchcount ++;      
+          } else {
+            /*If no switching has been done AND the direction is "asc",
+            set the direction to "desc" and run the while loop again.*/
+            if (switchcount == 0 && dir == "asc") {
+              dir = "desc";
+              switching = true;
+            }
+          }
+        }
+      }
+      
+
+    </script>
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/global_data.js') }}"></script>
+    <!--add to ensure bootstrap works--->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+    <!---------------------------------->
+
+
+  </body>
+</html>

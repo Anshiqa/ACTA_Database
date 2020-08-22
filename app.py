@@ -17,11 +17,13 @@ app =Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = 'static/Uploads'
 app.config['AUTO_UPLOAD_FOLDER'] = 'static/autoUploads'
+app.config['GLOBAL_DATA_UPLOADS'] = 'static/globalDataUploads'
 
-connection = mysql.connector.connect(host='actalab.c1smye8boisx.us-east-2.rds.amazonaws.com',
+
+connection = mysql.connector.connect(host='actalab-rds.cwk19lew5lew.ap-southeast-1.rds.amazonaws.com',
                                     database='actalab',
                                     user='admin',
-                                    password='12345678') 
+                                    password='Actalab!#%&SUTD') 
 #must add inbound rule in RDS--> 0.0.0.0 in security group to allow all ip adresses to enter 
 
 #verify if connected
@@ -308,6 +310,9 @@ def auto_add_DB():
 
 #---------------------------------------------------------------
 #need to include the method 'post' in order for the form submit button to work
+
+
+
 @app.route('/upload_data',  methods=['GET', 'POST'])
 def upload_data():
     return render_template('upload_data.html')
@@ -315,6 +320,119 @@ def upload_data():
 @app.route('/aja-log')
 def aja_log():
     return render_template('aja_log.html')
+
+
+@app.route('/global-data',  methods=['GET', 'POST'])
+def upload_data_global():
+    warningMessage = ""
+    cursor.execute('SELECT property FROM global_published_data')  #get all avail properties to show in dropdown
+    global_published_property_dict = cursor.fetchall()
+    global_published_property_dict = [i for n, i in enumerate(global_published_property_dict) if i not in global_published_property_dict[n + 1:]] #remove duplicates
+    #first import json module!!
+    #store uploaded json file
+    if request.method =='POST':
+        if request.form['submit_button'] == 'upload_file':
+            #-------save file to database---
+            globalDataFile = request.files['UploadGlobalFile'] #call file from the HTML form
+            #split the extension name from the file name to add to new file name later
+            global_data_extension = os.path.splitext(globalDataFile.filename)[1]
+            #create a new unique file name using uuid
+            global_data_f_name = str(uuid.uuid4()) + global_data_extension
+            #add the autouploadedfile into the autoUpload folder (Declared in app confign above) 
+            globalDataFile.save(os.path.join(app.config['GLOBAL_DATA_UPLOADS'], global_data_f_name))
+            globalFullFilePathServer = "static/globalDataUploads/" + global_data_f_name #get path name of file in server back
+            theGlobalDataFile = convertToBinaryData( globalFullFilePathServer )
+            print ('globalfilename', global_data_f_name) #filename 55166e7d-72df-46dc-b0e0-8d67b3fe35e0.pdf
+            print ('bytes:', uuid.uuid4().bytes) #bytes: b'\x8f[\x84\xafr\x1fOF\xa3\xee\xa8\t\xcd\xf5SJ'
+
+            #---Read file and create dictionary of key-values in header---
+            with open(globalFullFilePathServer) as f: #open submitted json file and read file
+                global_data_listOfDicts = json.load(f)
+                print("type of data: ", type(global_data_listOfDicts)) #list
+
+            for aDict in global_data_listOfDicts:
+                #extract data from each dict
+                newMaterial = aDict['material']
+                newProperty = aDict['property']
+                newPropertyValue = aDict['propertyVal']
+                newSentence = aDict['sentence']
+                newYear = aDict['year']
+                newDoi = aDict['DOI']
+
+            #---create new increment submission id because auto_increment feature in MySQL not account for deleted rows"""
+                used_subid_list = [] #get list of all used submission ids to automatically set new sub_id 
+                cursor.execute('SELECT global_sub_id FROM global_published_data')
+                used_submissionID = cursor.fetchall() #data: [{'submission_id': ___}, {'submission_id': ___},..]
+                if not cursor.rowcount: #specifies number of rows that the last .execute*() outputs. If not means if the nu of rows == 0
+                    this_submission_id = 1
+                    print ("No data yet")
+                else:
+                    for i in used_submissionID:
+                        used_subid_list.append(i['global_sub_id']) 
+                        used_subid_list = sorted(used_subid_list)
+                        this_submission_id = used_subid_list[-1] + 1 #grab last id and add 1
+            #---now insert all data into table (within the for loop for each dict)-----
+                insertQueryGlobalData = "INSERT INTO global_published_data(global_sub_id, material, property, property_value, sentence, year, doi) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                cursor.execute( insertQueryGlobalData, (this_submission_id, newMaterial, newProperty, newPropertyValue, newSentence, newYear, newDoi))
+                print("data from globally published sources inserted")
+                connection.commit()
+
+            #--insert datafile into globalExtractedFiles table 
+            used_fileid_list = [] #get list of all used submission ids to automatically set new sub_id 
+            cursor.execute('SELECT global_file_id FROM global_extracted_files')
+            used_fileIDs = cursor.fetchall() #data: [{'submission_id': ___}, {'submission_id': ___},..]
+            if not cursor.rowcount: #specifies number of rows that the last .execute*() outputs. If not means if the nu of rows == 0                this_submission_id = 1
+                print ("No data yet")
+                this_file_id = 1
+            else:
+                for i in used_fileIDs:
+                    used_fileid_list.append(i['global_file_id']) 
+                    used_fileid_list = sorted(used_fileid_list) #sort the list in ascending order
+                    this_file_id = used_fileid_list[-1] + 1 #grab last id and add 1
+            insertGlobalExtractedFile = "INSERT INTO global_extracted_files(global_file_id, global_data_file, global_file_name_in_server, global_data_format) VALUES (%s, %s, %s, %s)"
+            cursor.execute( insertGlobalExtractedFile, (this_file_id, theGlobalDataFile, globalFullFilePathServer, global_data_extension))
+            connection.commit()
+            global_published_searched_data = {}
+
+        elif request.form['submit_button'] == "search_data":
+            print("the search button has been pressed.")
+
+            firstValue=request.form['firstValue'] #labelled by the 'name': in form
+            secondValue=request.form['secondValue']
+            selectedProperty = request.form['selectedProperty'] 
+            print ('firstValue: ', firstValue)
+            print('secondValue: ', secondValue)
+            print('selectedProperty: ', selectedProperty)
+    
+            #--for new tables format---------------------------------------------------
+            #query for all submitted items in the database 
+            queryForSearchedData = "SELECT * FROM global_published_data WHERE property = %s and property_value between %s and %s"
+            searchPlaceholderStrings = (selectedProperty,firstValue, secondValue,) #will be used to replace the %s placeholder in the query execute
+            cursor.execute(queryForSearchedData, searchPlaceholderStrings)
+            global_published_searched_data = cursor.fetchall() #data: [{'submission_id': ___,'instrument_name':___...}, {'submission_id': ___, 'instrument_name':___...},..]  
+            if cursor.rowcount > 80:
+                warningMessage = "Warning: More than 80 results found. Limit your range further."
+                print (warningMessage)
+                global_published_searched_data = {}
+
+            print ('global_published_searched_data: ',global_published_searched_data)
+    
+    else:
+        global_published_searched_data = {}
+
+    return render_template('upload_global_data.html', global_published_property_dict = global_published_property_dict, global_published_searched_data = global_published_searched_data, warningMessage = warningMessage)
+
+
+@app.route('/view-global-data/<theProperty>', methods=['GET', 'POST'])
+def view_global_data(theProperty):
+    print ('theProperty: ', theProperty)
+    #query for compostition value of each submission id 
+    queryForSingleProperty = "SELECT * FROM global_published_data WHERE property = %s"
+    PropertyString = (theProperty, ) #will be used to replace the %s placeholder in the query execute
+    cursor.execute(queryForSingleProperty, PropertyString)
+    global_published_data_dict = cursor.fetchall() #data: [{'submission_id': ___,'instrument_name':___...}, {'submission_id': ___, 'instrument_name':___...},..] 
+    print ('global_published_data_dict: ', global_published_data_dict)
+    return render_template('view_global_data.html', global_published_data_dict=global_published_data_dict)
 
 @app.route('/about')
 def about():
